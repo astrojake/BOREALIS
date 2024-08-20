@@ -1,0 +1,75 @@
+;calculations for lofar post-process numbers
+;input: x     (x ramp; threshold values)
+;       y     (values of curve; either ON or On-OFF) 
+;       gauss (gaussian curve) 
+;Flags:
+;       Q1 ; Run Q1 (need to input y2)
+;       Q4 ; Run Q4 
+;       y2 ; OFF curve 
+;
+;Output: 
+;       out; numerical values for Q1 or Q4 
+;Version; 
+;               
+pro calc_ppextra,x,y,gauss=gauss,out=out,Q1=Q1,Q4=Q4,y2=y2
+  n = n_elements(x) 
+  ny= n_elements(y) 
+  If n ne ny then begin
+   print,'Nx and Ny not equal!'
+   stop 
+  endif  
+
+If keyword_set(Q4) then begin
+  ;Out array
+         
+  out = fltarr(12) 
+
+  ;Integral of ON-OFF curve
+  out[0]    = INT_TABULATED(x,y)    
+  
+  ;Ratio of ON-OFF Integral to Gaussian 
+  int_gauss1 = INT_TABULATED(x,gauss);Integral of Gaussian
+  int_gauss2 = INT_TABULATED(x,(gauss*2.0))
+  int_gauss3 = INT_TABULATED(x,(gauss*3.0))
+  out[1]     = float(out[0])/float(int_gauss1)     ;ratio
+  out[2]     = float(out[0])/float(int_gauss2)
+  out[3]     = float(out[0])/float(int_gauss3)
+
+  ;Fraction of ON-OFF values >0 
+  wabove = where(y gt 0,count_above)
+  wnonzero = where(y ne 0, count_nonzero)
+  ;print,count_zero
+  out[4] = (float(count_above)/float(count_nonzero))*100.0
+
+  ;Number of values above 1,2, 3 sigma 
+  w_1 = where(y gt gauss,count_above1)    
+  w_2 = where(y gt gauss*2.0,count_above2)
+  w_3 = where(y gt gauss*3.0,count_above3)
+  out[5] = count_above1
+  out[6] = count_above2
+  out[7] = count_above3
+
+  ;min/max threshold
+  w_b = where(x gt min(x[wabove]) and x lt max(x[wabove]),count_between) 
+  ;w_max = where(x eq max(x[wabove]))
+  out[8] = min(x[wabove])
+  out[9] = max(x[wabove])
+
+  ;% of y values > 0 between min and max threshold
+  w_b_pos = where(y[w_b] gt 0,count_b_above)
+  out[10] = (float(count_b_above)/float(n))*100. 
+  
+  ;% of values gt tau(max)
+  w_max = where(x gt out[9],count_allabove) ;select all values above max threhold
+  w_abovemax = where(y[w_max] ne 0,count_abovemax) ;
+  out[11] = (float(count_abovemax)/float(n))*100.  ;y above max threshold and non-zero
+endif 
+
+If keyword_set(Q1) then begin
+  out = fltarr(3) 
+  out[0] = INT_TABULATED(x,y)               ;integral of ON-OFF
+  wabove = where(y gt y2,count_above)        
+  out[1] = (float(count_above)/float(n_elements(x)))*100. ;% of time where ON > OFF
+  out[2] = stddev((y-y2))                     ;sddev of ON-OFF    
+endif 
+end

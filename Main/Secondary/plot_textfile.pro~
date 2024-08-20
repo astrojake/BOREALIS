@@ -1,0 +1,203 @@
+;plot_textfile.pro
+;Plots of PP tex files for V830Tau
+;
+;Input:  list     ;filename containing a list of PP txt files  
+;         sfilename; Sky filename
+pro plot_textfile,filename,Sfilename=Sfilename
+
+If keyword_set(Sfilename) then ratio = '; Sky ratio' else ratio=''
+If keyword_set(Sfilename) then skyratio = 1
+
+n = FILE_LINES(filename+'.txt')
+file = STRARR(n)
+ OPENR, unit, filename+'.txt',/GET_LUN
+ READF, unit, file
+ FREE_LUN, unit
+
+;intialize variables 
+x = indgen(n)
+Date=strarr(n) & S=strarr(n)	&fmin=dblarr(n)
+fmax=dblarr(n) & Tbeam=dblarr(n)&SBeam=dblarr(n)
+Q1a=dblarr(n,3) &Q1b=dblarr(n,3)	
+Q4a=dblarr(n,12)
+Q4b=dblarr(n,12)	&Q4c=dblarr(n,12)	&Q4d=dblarr(n,12)
+Q4e=dblarr(n,12)	&Q4f=dblarr(n,12)
+
+;sky variables
+Tbeam_s=dblarr(n)&SBeam_s=dblarr(n)
+Q1a_S=dblarr(n,3)+1.0 &Q1b_s=dblarr(n,3) +1.0	
+Q4a_s=dblarr(n,12)+1.0
+Q4b_s=dblarr(n,12)+1.0	&Q4c_s=dblarr(n,12)+1.0	&Q4d_s=dblarr(n,12)+1.0
+Q4e_s=dblarr(n,12)+1.0	&Q4f_s=dblarr(n,12)+1.0
+
+;read all data for Target
+for i=0,n-1 do begin 
+ print, file[i]
+ ;find date
+pos_date = strpos(file[i],'L5') ;flag! 
+da     = strmid(file[i],pos_date,7) ;for Dynspec
+ lofar_postprocess_textfile,file[i],Date=D,S=Sout,fmin=fmi,fmax=fma,BT=BT,BSky=BSky,$
+    	Q1aV=Q1aV,Q1bV=Q1bV,Q4aV=Q4aV,Q4bV=Q4bV,Q4cV=Q4CV,Q4dV=Q4dV,Q4eV=Q4eV,Q4fV=Q4fV,$
+        /READ
+  date[i]  = da
+  S[i]     = Sout
+  fmin[i]  = fmi
+  fmax[i]  = fma
+  TBeam[i] = BT
+  Sbeam[i] = Bsky
+  Q1a[i,*] = Q1aV
+  Q1b[i,*] = Q1bV
+  Q4a[i,*] = Q4aV
+  Q4b[i,*] = Q4bV
+  Q4c[i,*] = Q4cV
+  Q4d[i,*] = Q4dV
+  Q4e[i,*] = Q4eV
+  Q4f[i,*] = Q4fV
+endfor 
+
+OPENW, unit, filename+'_numbers.txt',/GET_LUN
+print_array = strarr(5,n)
+print_array[0,*] = x
+print_array[1,*] =date
+print_array[2,*] =S
+print_array[3,*] =fmin
+print_array[4,*] =fmax
+;print_array[5,*] =Tbeam
+;print_array[6,*] =Sbeam
+printf,unit,print_array
+FREE_LUN, unit
+
+;output file name with detections 
+If not(keyword_set(Sfilename)) then OPENW, unit, filename+'_Decection.txt',/GET_LUN
+If keyword_set(Sfilename) then OPENW, unit, filename+'_Decection_DivSky.txt',/GET_LUN
+
+;Read Sky
+If keyword_set(Sfilename) then begin
+ file_s = STRARR(n)
+ OPENR, unit2, Sfilename+'.txt',/GET_LUN
+ READF, unit2, file_s
+ FREE_LUN, unit2
+
+ for i=0,n-1 do begin 
+  lofar_postprocess_textfile,file_s[i],Date=D,S=Sout,fmin=fmi,fmax=fma,BT=BT,BSky=BSky,$
+    	Q1aV=Q1aV,Q1bV=Q1bV,Q4aV=Q4aV,Q4bV=Q4bV,Q4cV=Q4CV,Q4dV=Q4dV,Q4eV=Q4eV,Q4fV=Q4fV,$
+        /READ
+  S[i]     = Sout
+  fmin[i]  = fmi
+  fmax[i]  = fma
+  TBeam_S[i] = BT
+  Sbeam_s[i] = Bsky
+  Q1a_s[i,*] = Q1aV
+  Q1b_s[i,*] = Q1bV
+  Q4a_s[i,*] = Q4aV
+  Q4b_s[i,*] = Q4bV
+  Q4c_s[i,*] = Q4cV
+  Q4d_s[i,*] = Q4dV
+  Q4e_s[i,*] = Q4eV
+  Q4f_S[i,*] = Q4fV
+ endfor 
+endif ;end reading sky file
+
+If not(keyword_set(Sfilename)) then filename=filename
+If keyword_set(Sfilename) then filename = filename+'_DivSky'
+cgPS_Open,filename+'.ps'
+!P.Multi = [0, 3, 2]
+
+;------------
+;    Q1a
+;------------ 
+y = Q1a[*,0]/Q1a_s[*,0]
+cgplot,x,y,/xstyle, /ystyle,xrange=[min(x)-1,max(x)+1],yrange=[min(y)-min(y)*0.1,max(y)+max(y)*0.1], xtitle='Run #',ytitle='Integral '+ratio+' (SEFD)',title='Q1a: ON-OFF Integral',psym=16
+;If keyword_set(skyratio) then begin
+ printf,unit,'**********Q1a Detection (integral)********* '
+ w = where(y gt 1 and Q1a[*,0] gt 0,count) ;sky ratio gt 1 and value is postive 
+ If count gt 1 then printf,unit,print_array[*,w]
+;endif 
+
+
+y = Q1a[*,1]/Q1a_s[*,1]
+cgplot,x,y,/xstyle, /ystyle,xrange=[min(x)-1,max(x)+1],yrange=[min(y)-min(y)*0.1,max(y)+max(y)*0.1], xtitle='Run #',ytitle='ON>OFF '+ratio+' (%)',title='Q1a; ON-OFF >0',psym=16
+;If keyword_set(skyratio) then begin
+ printf,unit,'**********Q1a Detection (On-Off>0)********* '
+ w = where(y gt 1 and Q1a[*,1] gt 0,count ) ;sky ratio gt 1 and value is postive 
+ If count gt 1 then printf,unit,print_array[*,w]
+;endif 
+
+y = Q1a[*,2]/Q1a_s[*,2]
+cgplot,x,y,/xstyle, /ystyle,xrange=[min(x)-1,max(x)+1],yrange=[min(y)-min(y)*0.1,max(y)+max(y)*0.1], xtitle='Run #',ytitle='STDDEV '+ratio+' (SEFD)',title='Q1a: STDDEV On-OFF',psym=16
+;If keyword_set(skyratio) then begin
+ printf,unit,'**********Q1a Detection (STDDEV)********* '
+ w = where(y gt 1 and Q1a[*,2] gt 0,count) ;sky ratio gt 1 and value is postive 
+ If count gt 1 then printf,unit,print_array[*,w]
+;endif 
+
+;All three 
+printf,unit,'**********Q1a Detection (All)********* '
+w = where(Q1a[*,2] gt 0 and Q1a[*,1] gt 0 and Q1a[*,0] gt 0 and Q1a[*,0]/Q1a_s[*,0] gt 1 and Q1a[*,1]/Q1a_s[*,1] gt 1 and Q1a[*,2]/Q1a_s[*,2] gt 1,count) ;sky ratio gt 1 and value is postive 
+If count gt 1 then printf,unit,print_array[*,w]
+;------------
+;    Q1b
+;------------
+x = indgen(n) 
+y = Q1b[*,0]/Q1b_s[*,0]
+cgplot,x,y,/xstyle, /ystyle,xrange=[min(x)-1,max(x)+1],yrange=[min(y)-min(y)*0.1,max(y)+max(y)*0.1], xtitle='Run #',ytitle='Integral '+ratio+' (SEFD)',title='Q1b: ON-OFF Integral',psym=16
+;If keyword_set(skyratio) then begin
+ printf,unit,'**********Q1b Detection (integral)********* '
+ w = where(y gt 1 and Q1b[*,0] gt 0,count) ;sky ratio gt 1 and value is postive 
+ If count gt 1 then printf,unit,print_array[*,w]
+;endif 
+
+y = Q1b[*,1]/Q1b_s[*,1]
+cgplot,x,y,/xstyle, /ystyle,xrange=[min(x)-1,max(x)+1],yrange=[min(y)-min(y)*0.1,max(y)+max(y)*0.1], xtitle='Run #',ytitle='ON>OFF '+ratio+' (%)',title='Q1b; ON-OFF >0',psym=16
+;If keyword_set(skyratio) then begin
+ printf,unit,'**********Q1b Detection (On-Off>0)********* '
+ w = where(y gt 1 and Q1b[*,1] gt 0,count) ;sky ratio gt 1 and value is postive 
+ If count gt 1 then printf,unit,print_array[*,w]
+;endif 
+
+y = Q1b[*,2]/Q1b_s[*,2]
+cgplot,x,y,/xstyle, /ystyle,xrange=[min(x)-1,max(x)+1],yrange=[min(y)-min(y)*0.1,max(y)+max(y)*0.1], xtitle='Run #',ytitle='STDDEV '+ratio+' (SEFD)',title='Q1b: STDDEV On-OFF',psym=16
+;If keyword_set(skyratio) then begin
+ printf,unit,'**********Q1b Detection (STDDEV)********* '
+ w = where(y gt 1 and Q1b[*,2] gt 0,count) ;sky ratio gt 1 and value is postive 
+If count gt 1 then printf,unit,print_array[*,w]
+;endif 
+
+;------------------
+; Q4a
+;------------------
+q4_textplot,x,Q4a,'a',Q_sky=Q4a_s,skyratio=skyratio,print_array=print_array,unit=unit
+
+;------------------
+; Q4b
+;------------------
+q4_textplot,x,Q4b,Q_sky=Q4b_s,'b',skyratio=skyratio,print_array=print_array,unit=unit
+
+;------------------
+; Q4c
+;------------------
+q4_textplot,x,Q4c,Q_sky=Q4c_s,'c',skyratio=skyratio,print_array=print_array,unit=unit
+
+;------------------
+; Q4d
+;------------------
+q4_textplot,x,Q4d,Q_sky=Q4d_s,'d',skyratio=skyratio,print_array=print_array,unit=unit
+
+;------------------
+; Q4e
+;------------------
+q4_textplot,x,Q4e,Q_sky=Q4e_s,'e',skyratio=skyratio,print_array=print_array,unit=unit
+
+;------------------
+; Q4f
+;------------------
+q4_textplot,x,Q4f,Q_sky=Q4f_s,'f',skyratio=skyratio,print_array=print_array,unit=unit
+
+
+FREE_LUN, unit
+cgPS_Close
+cgfixps,filename+'.ps' 
+ps_pdf,/REMOVE
+
+end
+

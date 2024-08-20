@@ -1,0 +1,314 @@
+****************************************************************				 
+****************************************************************
+                README for Input File for LOFAR Pipeline 
+       Input File for BOREALISv4 (LOFAR, NenuFAR, or DynSpecMS)
+******************(Version 6 of Input file): March 26, 2021)****
+****************************************************************
+;-------------------------------------------------------------------------------------
+;					Target Info
+;-------------------------------------------------------------------------------------
+Target Name (e.g. TauBootis):                           TauBoo			- Target Name
+Target Period (days):                                	0.7365417		- Planetary period (used in post-processing) --- under development  
+Reference Time (Mid-Transit/periastron) (MJD):          55962.063374324		- Reference time (used in post-processing)   -- under development
+Date (e.g. LOFAR format: L429868, NENUFAR: UT date):    L545211			- Date in LOFAR format (L429868), Date for NENUFAR (20200411)
+Root Directory of Raw Data (e.g. /data/exoplanet/LC5/): /databf/EXO		- root file of the raw data (you must have write access write access to the file folder) 
+										   -If need be, you can symbolic link the data to a directory you have write access in 
+
+;-------------------------------------------------------------
+;    	   Telescope Information (which data to run?)
+;-------------------------------------------------------------
+RUN LOFAR (0=NO, 1=YES):                                0			- Run LOFAR data 
+RUN NENUFAR (0=NO, 1=YES):                              0			- Run NENUFAR data
+RUN LOFAR DynSpecMS (0=NO, 1=YES):                      0			- Run LOFAR DynSpecMS data 
+
+;-------------------------------------------------------------
+;       File to Run (required for NENUFAR and DynSpecMS) 
+;-------------------------------------------------------------
+Filename to run (see README for format)                 exoplanet 	-- for NENUFAR (e.g. TAU_BOOTIS_JOINT_CAMPAIGN_TAU_BOOTIS_TRACKING_20200411): don't include the time
+
+;-------------------------------------------------------------
+;                 What do you want to Run?
+;-------------------------------------------------------------
+Run QUICKLOOK (0=NO, 1=YES):                            - This command runs a quicklook on the data 
+Run RFI (0=NO, 1=YES):                                  - This command runs the RFI code on the data (main output will be RFI mask)
+RUN Processing (0=NO, 1=YES):                           - This command runs processing 
+							  (finds t-f normalization curve, applies RFI Mask & t-f curve to data, and rebins the data) 
+Run FFT (0=NO, 1=YES):                                  - This command runs an FFT on the data (useful for pulsar test data)
+RUN DE-DISP (0=NO, 1=YES):                              - This command runs de-dispersion on the data in the processing code (to be used in FFT code) 
+Run Post-processing (0=NO, 1=YES):                      - This command runs the post-processing code 
+
+;------------------------------------------------------------------------------------
+;     					QuickLook Settings
+;------------------------------------------------------------------------------------
+Plot Raw Data (0=No, 1 = YES):                          1		- Plots raw data
+Plot Normalized Data (0=No, 1 = YES):                   1		- Plots the raw data normalized by the background (10% quantile or average)
+Plot Data Normalized by a slope (0=No, 1 = YES):        1		- Plots the raw data normalized by the background and a linear slope across time 
+Min Frequency (MHz):                                    12.072693	- Min freq to plot
+Max Frequency (MHz):                                    73.730469	- Max freq to plot
+Amount of time per step (secs):                         40.		- The amount of time in each step to run
+Run full file (0=NO, 1= YES)				1		- Run full file 
+Min Time to run (secs, Not used if running full file):  0.0		- If not running full file, min time to plot 
+Number of steps (Not used if running full file):        3		- If not running full file, number of steps to take 
+Starting Beam:                                          0		- The starting beam to loop over
+Ending Beam:                                            0		- The ending beam to loop over
+Starting Polarization (I=0,Q=1,U=2,|V|=3,V^2=4,V'=5):   0		- Starting Polarization to loop over
+Ending Polarization   (L=6):                            0		- Ending Polarization to loop over
+
+;----------------------------------------------------------------------------------------------
+;           All Settings Below are for the Main Code (RFI,processing,post-processing)
+;----------------------------------------------------------------------------------------------
+
+;-----------------------------------------------------------
+;   		   Beams to run in loop
+;----------------------------------------------------------
+Starting Beam:                                          - The starting beam to loop over
+Ending Beam:                                            - The ending beam to loop over
+
+;----------------------------------------------------------
+;        Polarization (see README for more details)
+;----------------------------------------------------------
+Polarization (I=0,Q=1,U=2,V=3,V_prime=4,L=5):           0  - Polarization to run (See Turner et al. 2019 for description of Vprime)
+
+;----------------------------------------------------------------
+;                        Time setup
+;----------------------------------------------------------------
+Min Time to run (secs):                                 2	- Minimum time to run 
+Number of spectra (e.g. 4000):                          4000	- Number of spectra to run (e.g. 4000 for LOFAR or 1430 for NENUFAR)
+Run full file (0=NO, 1=YES)				0	- Run full file 
+								  - NENUFAR: If running full file, all other time setup commands are ignored. 
+									Code uses the slices of each pointing to find RFI, etc..
+Number of steps (Ignored if running full file):         257	- Number of steps to take (ignored if running full file)
+
+;---------------------------------------------------------------------
+;      				General Settings 
+;---------------------------------------------------------------------
+Create PS Files (0=NO, 1=YES):                          - Create PS files (will be converted to pdfs in the end)
+Verbose (0=No, 1=YES):                                  - Print comments (recommended) 
+Read/Save Mask in Bits (0=NO, 1=YES):                   - Read/save the mask in bits (this will save disk space).               -- not used for NENUFAR 
+Manipulate the mask in Bits (0=NO, 1=YES):              - In the code, always keep in the mask in bits (this will save memory)  -- not used for NENUFAR 
+Send an email about code progress (0=NO, 1=YES):        - Email yourself when the codes finishes (this is useful for long and multiple runs) 
+Email Address:                                          - email address
+
+;--------------------------------------------------------------
+;                       RFI Settings
+;--------------------------------------------------------------
+Sigma Value for Patrol (Default: 5.5):                  - sigma value for the Patrol RFI technique
+Sigma Value for LE_SIG (Default: 3.5):                  - sigma value for the ZURFIM RFI technique
+Run Patrol (0=NO, 1=YES):                               - Run the patrol RFI technique
+Run LE_SIG (0=NO, 1=YES):                               - Run the ZURFIM technique
+Run SUM (0=NO, 1=YES):                                  - Run the SUM technique 
+Run PEX (0=NO, 1=YES):                                  - Run the PEX technique 
+
+;-----------------------------------------------------------
+;          Processing Settings
+;-----------------------------------------------------------
+Find the Time-Frequency Correction (0=NO, 1=YES):       - Find the time-frequency correction
+							  - NENUFAR: not used 
+Apply the Time-Frequency Correction (0=NO, 1=YES):      - Normalize the data by the t-f correction curve 
+Run Method 2 (0=NO, 1 = YES) (Default: YES):            - Use the normalization in the RFI step to make the t-f curve  --faster to do
+
+;------------------------------------
+;           Rebin Settings
+;------------------------------------
+Rebin the data (0=NO, 1=YES):                           - Option to rebin the data (recommended to reduce size of data files)
+Rebin Frequency (kHz) (Default: 45.0):                  - Rebin frequency 
+Rebin Time (secs) (Default: 1.0):                       - Rebin time 
+
+;------------------------------------
+;   De-dispersion Settings
+;------------------------------------
+What beam to run de-dispersion (any beam):              - What beam to run the de-dispersion on (normally the pulsar beam)
+Name of de-disperson beam (e.g. B0823+26):              - Name of beam
+dm (pc^3 cm):                                           - DM value
+Rebin Frequency for De-dispersion (MHz):                - Rebin frequency for de-dispersed data
+
+;--------------------------------------------------------------------------
+;  				FFT Settings 
+;--------------------------------------------------------------------------
+What beam to run FFT (pulsar beam):                     - What beam to run FFT on 
+Period (usually Pulsar) for FFT (secs):                 - Period of comparison for FFT
+Min Mask Threshold for FFT:                             - Threshold for the mask 
+Min Frequency for FTT (MHz):                            - Min frequency to look at in the data for the FFT
+Max Frequency for FFT (MHz):                            - Max frequency to look at in the data for the FFT
+
+;----------------------------------------------------------------------------
+;                       Post-Processing Settings				- See Turner et al. 2019, 2021
+;       Note:Post-processing is very complicated. Make sure you read README
+;----------------------------------------------------------------------------
+Target Beam to Run (Default: 0):                        - Target beam # to run post-processing 
+Sky Beam to Run (Default: 2):                           - Sky beam # to run post-processing
+Run Q1 (0=No, 1 = YES):                                 - Run Q1 
+Run Q2 (0=No, 1 = YES):                                 - Run Q2
+Run Q3 (0=No, 1 = YES):                                 - Run Q3
+Run Q4 (0=No, 1 = YES):                                 - Run Q4 
+
+;-----
+
+;-------------------------------------------------------------------------------------------------------------
+;-------------------------------------------------------------------------------------------------------------
+;			      Caution!!!! Caution!!!! Caution!!!! Caution!!!!Caution!!!!
+;                           Everything below does not need to be changed in normal operation
+;                         (Advanced users can change settings but read the README if interested)
+;-------------------------------------------------------------------------------------------------------------
+;-------------------------------------------------------------------------------------------------------------
+
+;---------------------------------
+;Advanced Setting for LOFAR DATA
+;----------------------------------
+;Note: It was discovered that the first and last channel 
+;      in each subband was causing problems. Therefore by 
+;      default we eliminate them during the analysis 
+;---------------------------------------------------------
+Remove Bad Frequencies (0=NO, 1=YES):                   - The first and last channel in each subband of LOFAR beam-formed data is corrupted. 
+							- This is a known problem. In the default analysis, we eliminate these frequencies from the analysis 
+
+;-------------------------------------------------------------
+;  Advanced Settings for Frequency Selection for RFI/Processing
+;-------------------------------------------------------------
+;Note: Changing the Frequency Settings for RFI/processing will 
+;      cause problems because of the elimination of the bad channels 
+;      at the start and end of each subband
+;Fmin and Fmax by default are taken from the header 
+;-------------------------------------------------------------
+Change Frequency Settings (0=NO, 1=YES) (Default: NO):  - If you want to change the frequency. 
+							- As mentioned in the note: changing the Frequency is not recommended. It is easy to change the frequencies in post-processing 
+Min Frequency (MHz):                                    - Min frequency to choose
+Max Frequency (MHz):                                    - Max frequency to choose 
+			
+;--------------------------------------------------------------
+;                    RFI Advanced Settings
+;--------------------------------------------------------------
+Normalize by the quantile (0=No, 1 = YES):              - In order to find RFI, we have the normalize the data. Each step is normalized by the integrated spectrum  
+							- This setting allows for the normalization by a x% quantile of the distribution of intensities at each frequency 
+							- If NO, then the program will just normalized the data by the average integrated spectrum
+							- Not recommended for NENUFAR data  
+Quantile used in normalization (Default: 0.10):         - A 0.50 quantile will be the average, 0.10 will be more robust against RFI 
+Save the Mask (0=No, 1 = YES):                          - Save the mask for the RFI 
+
+;--------------------------------------------------------------
+;                   RFI Advanced Settings 2
+;              (Parameters for PATROL,LE_SIG,SUM,PEX)
+;--------------------------------------------------------------
+Window Width in Freq for PATROL (Default: 151):         - Width of sliding window in frequency for patrol 
+Window Width in Time for PATROL (Default: 101):         - Width of sliding window in frequency for patrol
+Window Width in Freq for LESIG (Default: 151):          - Width of sliding window in frequency for LESIG
+Window Width in Time for LESIG (Default: 101):          - Width of sliding window in frequency for LESIG
+Run sliding windows files in working dir (0=NO, 1=YES): - Do you want to run the mt.dat and mf.dat files located in the current working directory, other they use /sub files 
+Sliding Windows in Freq for SUM (/sub or working dir):  - the file mt.dat has the sliding windows for SUM (in the folder /sub) 
+Sliding Windows in Time for SUM (/sub or working dir):  - the file mf.dat has the sliding windows for SUM (in the folder /sub) 
+Threshold for SUM (Default: 10.0):                      - Threshold for SUM 
+Min Expansion in Freq for PEX (pixels) (Default: 3):    - Minimum pixel size for contiguous patch to be expanded by pex
+Expantion in Freq for PEX (pixels) (Default: 1):        - Number of pixels to expand 
+Min Expansion in Time for PEX (pixels) (Default: 3):    - Minimum pixel size for contiguous patch to be expanded by pex
+Expasion in Time for PEX (pixels) (Default: 1):         - Number of pixels to expand 
+Min Expansion in Freq for PEX 2 (pixels) (Default: 5):  - Minimum pixel size for contiguous patch to be expanded by pex
+Expasion in Freq for PEX 2 (pixels) (Default: 3):       - Number of pixels to expand 
+Min Expansion in Time for PEX 2 (pixels) (Default: 5):  - Minimum pixel size for contiguous patch to be expanded by pex
+Expasion in Time for PEX 2 (pixels) (Default: 3):       - Number of pixels to expand 
+
+
+;----------------------------------------------------------------------------
+;                        RFI Debug Tools
+;----------------------------------------------------------------------------
+Run RFI; Use RFI Mask from previous run if NO (0=No, 1 = YES) (Default: YES):   - If Yes: run RFI code. If No: read in RFI mask and created outoupts
+Save Full-Res RFI-mitigated Data (0=No, 1 = YES) (Default: NO):                 - Save the full-resolution dynamic spectrum after RFI mitigation 
+Save Frequency Response for every step (0=No, 1 = YES) (Default: NO):           - Save the 10% quantile from every step
+Complex name for outputs includes RFI settings (0=No, 1 = YES) (Default: NO):   - file names will have RFI parameters (e.g. rebindata_L569123_pol4_10779sec_RFI_patrol5.5_pex_lesig3.5_sum_beam2.sav) 
+
+;----------------------------------------------------------------------------
+;            De-dispersion Advanced Settings (After De-dispersion)
+;----------------------------------------------------------------------------
+Rebin Time for De-Dispersion (0=NO, 1 = YES) (Default: NO):                     - Do you want to rebin the de-dispersed data in time? 
+Rebin Time for De-dispersion (secs) (Default: 0.0):                             - Rebin time for the de-dispersed data
+
+;----------------------------------------------------------------------------
+;                       FFT advanced Setting
+;----------------------------------------------------------------------------
+Change in dm (pc^3 cm) (Default: 0.0):                                          - In the FFT code, you can change the DM value slightly. 
+                 
+;----------------------------------------------------------------------------
+;             Combined Mask: Processing Settings
+;----------------------------------------------------------------------------
+Create the Combined Mask for analysis (0=No, 1 = YES) (Default: NO):            - Do you want to create the combined mask
+Use the Combined Mask for analysis (0=No, 1 = YES) (Default: NO):               - Do you want to use the combined mask in the analysis 
+Number of masks to combine together (# of beams) (Default: 0):                  - How many beams to combine together? It should be the same as the question below
+What masks do you want to combine together (e.g. 0,1):                          - which beams do you want to combine together
+
+;------------------------------------------------------------------------------------
+;                     Additional Advanced Processing Settings 
+;------------------------------------------------------------------------------------
+Smooth the 2-d Time-Frequency Surface (0=No, 1 = YES) (Default: NO):            - The t-f response is smoothed in the frequency direction
+Number of spectra to smooth surface over (Default: 11):                         - number of spectra to smooth
+Run PCA analysis (-- under development) (0=No, 1 = YES) (Default: NO): 		- Run PCA to find background ==== under development
+ 
+;-------------------------------------------------------------------------------------
+;                     Debugging Tools for Processsing
+;-------------------------------------------------------------------------------------
+Skip Rebin Step in Time-Freq Correction (0=No, 1=YES) (Default: NO):            - Skip reading in data for the t-f method 1 
+Save Rebinned Data in Time-Freq Correction (0=No, 1=YES) (Default: NO):         - Save rebinned data used in t-f method 1 
+
+;----------------------------------------------------------------------------------------------------------------------
+;                   Post-Processing Advanced Settings
+;             Note:Post-processing is very complicated. 
+;       See Turner et al. 2019, 2021 and the README for more details
+;----------------------------------------------------------------------------------------------------------------------
+Do you want to rebin in time for post-processing (Default:NO) (0=NO, 1 = YES):                                 - Rebin the rebinned data (default rebinned data is in 1 sec) 
+Rebin Time for post-processing (secs) (Default: 1 secs):                                                       - New rebin time
+Do you want to rebin in frequency for post-processing (Default:YES) (0=NO, 1 = YES):                           - Rebin the rebinned data in frequency (usually yes) 
+Rebin Freq for post-processing (MHz) (Default: 0.2):                                                           - New rebin freq
+Time interval to create the time series Q1 & Q3 (secs) (Default: 120):           	                       - Time interval for Q1 & Q3 
+Run default thresholds for the mask (defaults: 1, 0.10) (0=No, 1 = YES):                                       - Run the default mask thresholds 
+Run an additional threshold for the mask (0=NO, 1 = YES):                                                      - Run another mask threshold
+Additional threshold to run for the mask (e.g. 0.05):                                                          - Additional mask threshold 
+Run Default Frequency Ranges (Default: whole range & 10 MHz segments) (0=NO, 1 = YES):                         - Run default freq ranges 	
+Run an additional Frequency Range (0=NO, 1 = YES, Default: 0):                                                 - Run additional freq range 
+Additional Frequency Range to Run (e.g. fmin,fmax):                                                            - Additional range to run
+Run Default Time Selection for Q2 (Default: Entire time) (0=NO, 1 = YES): 				       - Run default time selection                   
+If NO, Time selection to run for Q2 (secs) (e.g. tmin,tmax):                                                   - If NO, Time selection to run
+Run default thresholds for peak detection (units:sigma) (Default: 0.50-5.2 in 0.1 steps) (0=NO, 1 = YES):      - Run default threshold for peak detection in Q4 (0.5 - 5.2 sigma)
+Additional threshold for peak detection to run (units:sigma):                                                  - Additional threshold
+Sigma clipping for peak detection (units:sigma) (Default: 10):                                                 - Sigma clip Q2 for peak detection
+Threshold for individual pixels in dynspec mask (units:sigma) (Default: 0.50)				       - Threshold for individual pixels in the input dynamic spectra mask 
+Threshold for Q4 plots (units:sigma) (Default: 2.5) 							       - Threshold for plotting Q4 and plotting dynamic spectrum 
+Slope value comparing beams for Q3f/Q4f (Default: 2)							       - Slope value for Q3f/Q4f							
+Window size for high pass filter to create Q2 (units:time steps) (Default: 10) 				       - window size for the high pass filter			
+Run elliptical correction on Q2 (Default:YES) (0=NO, 1 = YES): 						       - Run the elliptical correction on Q2	
+Run NO-ellipical correction on Q2 (Default:NO) (0=NO, 1 = YES):                                                - Don't Run the elliptical correction on Q2 
+Save Q Values in sav file (Default:YES) (0=NO, 1 = YES):						       - Save Q values to sav file 							
+Label for ON Beam (e.g. On Beam) 									       - Label for the On beam							
+Label for OFF Beam (e.g. Off Beam)									       - Label for the off beam 							
+Plot extra beam 1 (Beam Number, e.g. 2) (0=NO):								       - Plot extra beam for Q1
+Plot extra beam 2 (Beam Number, e.g. 23) (0=NO):							       - Plot extra beam for Q1 
+Remove pdf with separate pages for each Q plot (Default:YES,save space) (0=NO, 1 = YES)                         - remove large pdf
+Remove Jargon from the title of plots (e.g. for papers or presentations) (0=NO, 1 = YES)                        - remove jargon from plots
+Minimum threshold to calculate Qs (default:1, start of threshold array)                                         - min threshold for Q4 and Q3s
+Max threshold to calculate Qs (default:5.9, end of threshold array)                                             - max threshold for Q4 and Q3
+
+;-----------------------------------------------------------------------------------------------------------
+; Post-Processing Advanced Settings for Combining Dates                  
+; (Note: Combining Dates requires some special steps, See README)	- Currently the post-processing code does not work for combining dates. 
+									- It worked in old iterations of the code
+									- Exact format of combining dates is TBD
+; (Note: Combining Dates requires some special steps, See README) -- under development
+;-----------------------------------------------------------------------------------------------------------
+Root File to combine dates (e.g. /data/exoplanet/LC5_DDT_002/combine):  - where the data is located
+Filename containing all dates and steps to combine (e.g. L429868 376):  - filename
+Create the combined dates sav files (0=No, 1=YES):                      - create the combined dates sav file 
+How many beams to create the combined dates sav files:                  - How many beams do you want to create?
+What beams to create the combined dates sav files (e.g. 0,2):           - what beams
+Post-Process the Combined Dates (0=No, 1=YES, Default: 0):              - Using the combined dates sav file for post-processing
+
+;-------------------------------------------------------------------------------------------------------------
+;-------------------------------------------------------------------------------------------------------------
+                                     Caution!!!! Caution!!!! Caution!!!! Caution!!!!     -  This part of the input is only used for the Jupiter project 
+;                           Everything below here are very advanced features to the code
+;				   Normal users will never deal with these parameters
+;-------------------------------------------------------------------------------------------------------------
+;-------------------------------------------------------------------------------------------------------------
+
+;------------------------------------------------------------
+;Very Advanced Settings for Jupiter Emission Tests 
+;  (see Jupiter_Input.dat for more inputs)
+;------------------------------------------------------------
+RUN JUPITER (0=NO, 1=YES) (Default: NO):               - Do you want to run Jupiter analysis?
+Input Jupiter Filename (eg. Jupiter_Input.dat)          - Input file for Jupiter analysis 

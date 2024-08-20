@@ -1,0 +1,43 @@
+; **********************
+; *                    *
+; *   BACKGROUND.PRO   *
+; *                    *
+; **********************
+pro background, data, bck,sig,ndata, POSITIVE=POSITIVE, NSIG=NSIG
+; Background and sig of a 1-D distribution of intensities.
+
+; (INPUT)
+; data = 1-D array of intensities
+; (OUTPUT)
+; bck,sig = background and fluctuations (1 sig level)
+; ndata = number of values upon which bck,sig are computed
+; POSITIVE = retains only data values > 0
+; NSIG = number of sigmas
+
+  if not(keyword_set(NSIG)) then nsig=3.	; previously 2.5*sig
+  if keyword_set(POSITIVE) then begin
+    test=where(data gt 0.)
+    if test(0) ne -1 then data2=data(test) else begin
+	bck=0 & sig=-1 & ndata=0 & goto,fin
+    endelse
+  endif else data2=data
+  if n_elements(data2) gt 1 then begin
+	bck=mean(data2,/double) & sig=stddev(data2,/double)
+  endif else begin
+        bck=data2(0) & sig=0 & ndata=1 & goto,fin
+  endelse
+  ndata=1
+
+loop:
+  test=where(abs(data2-bck) lt nsig*sig)
+  if n_elements(test) eq 1 then goto,fin
+  ndata=n_elements(test)
+  moy=mean(data2(test),/double)
+  sig=stddev(data2(test),/double)
+  if moy eq bck then goto,fin
+  bck=moy
+  goto,loop
+
+fin:
+return
+end

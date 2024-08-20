@@ -1,0 +1,1 @@
+;--------------------------------------------------------------------  pro HELP_SPDYN;--------------------------------------------------------------------  print,'SPDYN_X, image, xmin,xmax,ymin,ymax, grid(0/1),linlog(0/1)'  print,'SPDYNXL, image, xmin,xmax,ymin,ymax, grid(0/1)'  print,'SPDYNX, image, xmin,xmax,ymin,ymax, grid(0/1)'returnend

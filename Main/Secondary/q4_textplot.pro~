@@ -1,0 +1,104 @@
+;Input
+;      x   ; x ramp 
+;      Q   ; Q to be plotted
+;      Q_l ; Q label
+;      skyratio; whether Q value is divided by the sky 
+;      unit    ; unit for the output file
+;
+pro q4_textplot,x,Q,Q_l,Q_sky=Q_sky,skyratio=skyratio,print_array=print_array,unit=unit
+ If keyword_set(skyratio) then ratio='Sky Ratio' else ratio=''
+ If not(keyword_set(Q_sky)) then Q_sky = 1.0
+ 
+ ;---------
+ ;integral 
+ ;---------
+ y = Q[*,0]/Q_sky[*,0]
+ cgplot,x,y,/xstyle, /ystyle,xrange=[min(x)-1,max(x)+1],yrange=[min(y)-max(y)*0.1,max(y)+max(y)*0.1], xtitle='Run #',ytitle='Integral'+ratio+' (SEFD)',title='Q4'+Q_l+': ON-OFF Integral',psym=16
+   ;---print---
+   printf,unit,'**********Q4'+Q_l+' Detection (Integral)********* '
+   w = where(y ge 1.00 and Q[*,0] ge 0,count) ;sky ratio ge 1 and value is postive 
+   If count ge 1 then printf,unit,print_array[*,w]
+ 
+ ;---------
+ ;ratio 
+ ;--------
+ y1 = Q[*,1]/Q_Sky[*,1]
+ y2 = Q[*,2]/Q_sky[*,2]
+ y3 = Q[*,3]/Q_sky[*,3]
+ ys = [y1,y2,y3]
+ cgplot,x,y1,/xstyle, /ystyle,xrange=[min(x)-1,max(x)+1],yrange=[min(ys)-max(ys)*0.1,max(ys)+max(ys)*0.1], xtitle='Run #',ytitle='Ratio'+' '+ratio,title='Q4'+Q_l+': On-OFF Integral Ratio to Gaussian',psym=16
+ cgplot,x,y2,psym=16,color='red',/overplot
+ cgplot,x,y3,psym=16,color='blue',/overplot
+al_legend,['1sig','2sig','3sig'],textcolor=['black','red','blue'],/top,/left
+  ;---print---
+   printf,unit,'**********Q4'+Q_l+' Detection (Gaussian Ratio)********* '
+   w = where(Q[*,1] ge 0.80,count); value is postive 
+   print, max(Q[*,1]),count
+   printf,unit,'1sigma'
+   If count ge 1 then printf,unit,print_array[*,w]
+   If count ge 1 then print,'Q[*,1]',Q[w,1]
+   w = where(Q[*,2] ge 0.90,count) ; value is postive 
+   printf,unit,'2sigma'
+   If count ge 1 then printf,unit,print_array[*,w]
+   w = where(Q[*,3] ge 1,count );value is postive 
+   printf,unit,'3sigma'
+   If count ge 1 then printf,unit,print_array[*,w]
+;---print---
+   printf,unit,'**********Q4'+Q_l+' Detection (Gaussian Ratio with Sky Ratio)********* '
+   w = where(y1 ge 1 and Q[*,1] ge 1,count) ; value is postive 
+   printf,unit,'1sigma'
+   If count ge 1 then printf,unit,print_array[*,w]
+   w = where(y2 ge 1 and Q[*,2] ge 1,count) ; value is postive 
+   printf,unit,'2sigma'
+   If count ge 1 then printf,unit,print_array[*,w]
+   w = where(y3 ge 1 and Q[*,3] ge 1,count) ;value is postive 
+   printf,unit,'3sigma'
+  If count ge 1 then printf,unit,print_array[*,w]
+
+;%
+ y = Q[*,4]/Q_sky[*,4]
+ cgplot,x,y,/xstyle, /ystyle,xrange=[min(x)-1,max(x)+1],yrange=[min(y)-max(y)*0.1,max(y)+max(y)*0.1], xtitle='Run #',ytitle='%'+' '+ratio,title='Q4'+Q_l+': ON-OFF values > 0',psym=16
+  ;---print---
+   printf,unit,'**********Q4'+Q_l+' Detection (On-Off>0)********* '
+   w = where(y ge 1 and Q[*,4] ge 0,count) ;sky ratio ge 1 and value is postive 
+   If count ge 1 then printf,unit,print_array[*,w]
+ 
+;Number 
+ y1 = Q[*,5]/Q_sky[*,5]
+ y2 = Q[*,6]/Q_Sky[*,6]
+ y3 = Q[*,7]/Q_Sky[*,7]
+ys = [y1,y2,y3]
+ cgplot,x,y1,/xstyle, /ystyle,xrange=[min(x)-1,max(x)+1],yrange=[min(ys)-max(ys)*0.1,max(ys)+max(ys)*0.1], xtitle='Run #',ytitle='Number'+' '+ratio,title='Q4'+Q_l+': ON-OFF values above 1,2,3 sigma',psym=16,color='black'
+ cgplot,x,y2,psym=16,color='red',/overplot
+ cgplot,x,y3,psym=16,color='blue',/overplot
+al_legend,['1sig','2sig','3sig'],textcolor=['black','red','blue'],/top,/left
+  ;---print---
+   printf,unit,'**********Q4'+Q_l+' Detection (Values above 1,2,3sigma)********* '
+   w = where(y1 ge 1 and Q[*,5] ge 1,count) ; value is postive 
+   printf,unit,'1sigma'
+  If count ge 1 then  printf,unit,print_array[*,w]
+   w = where(y2 ge 1 and Q[*,6] ge 1,count) ; value is postive 
+   printf,unit,'2sigma'
+   If count ge 1 then printf,unit,print_array[*,w]
+   w = where(y3 ge 1 and Q[*,7] ge 1,count) ;value is postive 
+   printf,unit,'3sigma'
+  If count ge 1 then printf,unit,print_array[*,w]
+
+;%
+ y = Q[*,10]/Q_sky[*,10]
+ cgplot,x,y,/xstyle, /ystyle,xrange=[min(x)-1,max(x)+1],yrange=[min(y)-max(y)*0.1,max(y)+max(y)*0.1], xtitle='Run #',ytitle='% '+ratio,title='Q4'+Q_l+': % between max and min',psym=16
+ ;---print---
+   printf,unit,'**********Q4'+Q_l+' Detection (% between min and max)********* '
+   w = where(y ge 1 and Q[*,10] ge 0,count) ;sky ratio ge 1 and value is postive 
+  If count ge 1 then printf,unit,print_array[*,w]
+
+;%
+ y = Q[*,11]/Q_Sky[*,11]
+ finite = finite(y)
+ y = y*finite
+ cgplot,x,y,/xstyle, /ystyle,xrange=[min(x)-1,max(x)+1],yrange=[min(y)-max(y)*0.1,max(y)+max(y)*0.1], xtitle='Run #',ytitle='% '+ratio,title='Q4'+Q_l+': % > max',psym=16
+ ;---print---
+   printf,unit,'**********Q4'+Q_l+' Detection (%>max; Sky Ratio)********* '
+   w = where(y lt 1,count);sky ratio ge 1 and value is postive 
+  If count ge 1 then printf,unit,print_array[*,w]
+end

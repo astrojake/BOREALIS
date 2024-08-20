@@ -1,0 +1,39 @@
+****************************************************************				 
+****************************************************************
+                Jupiter Input File for LOFAR Pipeline 
+******************(Version 2: June 14, 2017)*********************
+****************************************************************
+----------------------------------------------------------------
+		What Jupiter Observations do you want to Run? 
+---------------------------------a-------------------------------
+Run LOFAR Jupiter Observations (0=NO, 1=YES):           1
+Run Nancay Jupiter Observations (0=NO, 1=YES):          0
+
+----------------------------------------------------------------
+		 LOFAR/NenuFAR Jupiter Observations
+----------------------------------------------------------------
+Root file of the data :                                 /data/jake.turner/exoplanet/LC7_013/Jupiter/L568467/
+Name of file to run (H5 for LOFAR, fits for NenuFAR):   L568467_SAP000_B000_S3_P000_bf
+Target Beam:                                            0
+RFI File for Target (under root)                        /data/jake.turner/exoplanet/Jupiter_LOFAR/RFI/Jupiter_Mask.h5
+start time of Jupiter data to add (s)                   2
+ending time of Jupiter data to add                      10799
+Min Frequency (MHz)                                     14 
+Max Frequency (MHZ)                                     26
+
+;--------------------------------
+;Background
+;------------------------------
+root file of background:                                /data/jake.turner/exoplanet/Jupiter_LOFAR/Background/
+Name of file:                                           background_V.sav
+
+;-----------------------------------------------------------
+;	Scaling to add to LOFAR/NenuFAR Sky Observations 				
+;-----------------------------------------------------------
+Min frequency in data to add Jupiter data (MHZ)         50.0d
+Reduction Factor (1/x)                                  1000
+
+;------------------------------------------------------------------------------------
+;    Method 2 Processing Settings (Default: 10% quantile from data+jupiter, NO: 10% quantile from data)
+;------------------------------------------------------------------------------------
+Run default method 2 processing (0=NO,1=YES)(Default:1) 1

@@ -1,0 +1,1 @@
+device,decompose=0loadct,13; xpalette

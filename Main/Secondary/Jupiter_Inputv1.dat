@@ -1,0 +1,40 @@
+*********************************************				 
+*********************************************
+ Input File for LOFAR Jupiter Emission Tests 
+*********************************************
+*********************************************
+;-----------------------------------------------------------
+;Note: this input file is only for the Jupiter emission tests
+;-----------------------------------------------------------
+
+;---------------------------------------------
+;         Which Jupiter data to add?
+;---------------------------------------------
+Do you want to add Nancay data (0=NO, 1=YES):            0
+Do you want to add Lofar data (0=NO, 1=YES):             0
+
+;---------------------------------------------------------------
+;             General Information
+;---------------------------------------------------------------
+Min Freq in LOFAR data to add Jupiter emission (MHZ):    50.0
+Reduction Factor of Jupiter Emission (Default: 100):     100
+Root Filename of Jupiter Emission Obs (e.g. /data/):     /data/jake.turner/exoplanet/Jupiter/ 
+Filename of h5 file with Jupiter Emission:               JupiterRH.h5
+Filename of Mask file of Jupitter Emission h5 file:      Jupiter_RFI.h5
+Start time of Jupiter data to add (secs):                2
+Ending time of Jupiter data to add (secs):               3678
+           
+;-----------------------------
+; Nancay Specific Information
+;-----------------------------
+Use 10% Quantile as background (0=NO, 1=YES,Default: 0): 0
+Use Background File (0=NO, 1=YES, Default: 1):           1
+Root Filename of Background File:                        /data/jake.turner/exoplanet/Jupiter/BackGround/
+Filename of Background save File:                        Jupiter_background.sav              
+
+;------------------------------
+;Lofar Specific Information 
+;------------------------------
+Root Filename of Background File:                       /data/jake.turner/exoplanet/Jupiter/BackGround/
+Filename of h5 Background File: 			Jupiter_background.h5
+
